@@ -1,0 +1,31 @@
+# Starter pipeline
+# Start with a minimal pipeline that you can customize to build and deploy your code.
+# Add steps that build, run tests, deploy, and more:
+# https://aka.ms/yaml
+
+trigger:
+- master
+
+variables:
+- group: production
+
+pool:
+  name: CCDC
+
+steps:
+- task: Docker@2
+  inputs:
+    containerRegistry: 'Gitlab Docker Registry'
+    repository: 'orlowsoft/roomy/roomy-api'
+    command: 'build'
+    tags: latest
+    Dockerfile: '**/Dockerfile'
+    arguments: --build-arg DB_ADDRESS_ARG=$(DB_ADDRESS)  --build-arg DB_USERNAME_ARG=$(DB_USERNAME)  --build-arg DB_PASSWORD_ARG=$(DB_PASSWORD) --build-arg DB_NAME_ARG=$(DB_NAME)
+
+- task: Docker@2
+  inputs:
+    containerRegistry: 'Gitlab Docker Registry'
+    repository: 'orlowsoft/roomy/roomy-api'
+    tags: latest
+    command: 'push'
+
